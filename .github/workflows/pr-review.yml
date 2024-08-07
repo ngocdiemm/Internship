@@ -1,0 +1,28 @@
+name: Pull Request Review
+
+on:
+  pull_request:
+    types: [opened, edited, reopened]
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Comment on Pull Request
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const pullRequest = context.payload.pull_request;
+            const user = pullRequest.user.login;
+            const message = `Hi @${user}, please review and merge this pull request when ready!`;
+            
+            // Create a comment on the pull request
+            await github.rest.issues.createComment({
+              ...context.repo,
+              issue_number: pullRequest.number,
+              body: message
+            });
